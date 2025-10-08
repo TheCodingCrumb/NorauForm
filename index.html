@@ -1,41 +1,110 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Formulaire avec Google Login</title>
-    <link rel="stylesheet" href="style.css" />
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-  </head>
-  <body>
-    <div
-      id="g_id_onload"
-      data-client_id="  .apps.googleusercontent.com"
-      data-callback="handleCredentialResponse"
-      data-auto_prompt="false"
-    ></div>
-    <div
-      class="g_id_signin"
-      data-type="standard"
-      data-size="large"
-      data-theme="outline"
-      data-text="sign_in_with"
-      data-shape="rectangular"
-      data-logo_alignment="left"
-    ></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion Google</title>
 
-    <div id="user-info" style="display: none">
-      <p>Connecté en tant que <span id="user-name"></span></p>
-      <form id="simple-form">
-        <label
-          >Votre message :
-          <input type="text" name="message" required />
-        </label>
-        <button type="submit">Envoyer</button>
-      </form>
-      <button id="logout">Déconnexion</button>
+  <!-- Vue.js -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Config locale -->
+  <script src="./config.js"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div id="app" class="bg-white p-8 rounded-2xl shadow-lg w-[400px] text-center">
+    <h1 class="text-2xl font-bold mb-6">Connexion Google</h1>
+
+    <div v-if="!user">
+      <div id="g_id_signin"></div>
     </div>
 
-    <script src="script.js"></script>
-  </body>
+    <div v-else>
+      <h2 class="text-xl font-semibold mb-2">{{ user.name }}</h2>
+      <p class="text-gray-600 mb-4">{{ user.email }}</p>
+      <button
+        @click="logout"
+        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+      >
+        Déconnexion
+      </button>
+    </div>
+  <script>
+    const { createApp } = Vue;
+
+    function initVue() {
+      createApp({
+        data() {
+          return { user: null };
+        },
+        mounted() {
+          const clientId = window.APP_CONFIG?.GOOGLE_CLIENT_ID;
+          if (!clientId) {
+            alert("❌ GOOGLE_CLIENT_ID manquant dans config.js !");
+            return;
+          }
+
+          google.accounts.id.initialize({
+            client_id: clientId,
+            callback: this.handleCredentialResponse,
+          });
+
+          google.accounts.id.renderButton(
+            document.getElementById("g_id_signin"),
+            { theme: "outline", size: "large" }
+          );
+        },
+        methods: {
+          handleCredentialResponse(response) {
+            const data = JSON.parse(atob(response.credential.split('.')[1]));
+            this.user = {
+              name: data.name,
+              email: data.email,
+            };
+          },
+          logout() {
+            // Désactive la connexion automatique
+            google.accounts.id.disableAutoSelect();
+
+            // Efface l'utilisateur
+            this.user = null;
+
+            // Supprime la session locale
+            localStorage.removeItem("google_user");
+
+            // Attendre que Vue recrée le div
+            this.$nextTick(() => {
+              const signInDiv = document.getElementById("g_id_signin");
+              if (signInDiv) {
+                signInDiv.innerHTML = ""; // vide l'ancien contenu
+                google.accounts.id.renderButton(signInDiv, {
+                  theme: "outline",
+                  size: "large"
+                });
+              }
+            });
+          }
+        },
+      }).mount("#app");
+    }
+
+    // 🔒 S’assurer que config.js est bien chargé avant Vue
+    if (window.APP_CONFIG?.GOOGLE_CLIENT_ID) {
+      initVue();
+    } else {
+      // Si config.js charge après ce script
+      window.addEventListener("load", () => {
+        if (window.APP_CONFIG?.GOOGLE_CLIENT_ID) initVue();
+        else alert("❌ Impossible de charger config.js !");
+      });
+    }
+  </script>
+</body>
 </html>
