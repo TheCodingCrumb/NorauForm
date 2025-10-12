@@ -53,13 +53,11 @@
 
   <div class="spacer"></div>
 
-
-
   <p-panel header="Formulaire">
     <form>
       <p-inputgroup>
         <p-inputgroupaddon>
-          <i class="material-symbols-outlined">face</i>
+          <i class="material-symbols-outlined">business_center</i>
         </p-inputgroupaddon>
         <p-floatlabel variant="on">
           <p-inputtext id="raison_sociale" type="text" inputmode="text" v-model="text1"></p-inputtext>
@@ -69,11 +67,11 @@
 
       <p-inputgroup>
         <p-inputgroupaddon>
-          <i class="material-symbols-outlined">call</i>
+          <i class="material-symbols-outlined">face</i>
         </p-inputgroupaddon>
         <p-floatlabel variant="on">
-          <p-inputnumber if="telephone" type="tel" inputmode="tel" v-model="number"></p-inputnumber>
-          <label for="telephone">Telephone</label>
+          <p-inputtext id="contact" type="text" inputmode="text" v-model="contact"></p-inputtext>
+          <label for="contact">Interlocuteur</label>
         </p-floatlabel>
       </p-inputgroup>
 
@@ -82,8 +80,68 @@
           <i class="material-symbols-outlined">call</i>
         </p-inputgroupaddon>
         <p-floatlabel variant="on">
-          <p-inputnumber if="code_vendeur" type="tel" inputmode="tel" v-model="number"></p-inputnumber>
+          <p-inputnumber id="telephone" type="tel" inputmode="tel" v-model="number"></p-inputnumber>
+          <label for="telephone">Telephone</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">badge</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputnumber id="code_vendeur" type="tel" inputmode="tel" v-model="employeeCode"></p-inputnumber>
           <label for="code_vendeur">Code Vendeur</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">email</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputtext id="email" type="text" inputmode="email" v-model="email"></p-inputtext>
+          <label for="email">Email</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">traffic_jam</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputnumber id="parkSize" type="text" v-model="parkSize"></p-inputnumber>
+          <label for="parkSize">Taille de la flotte</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">passkey</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputtext id="parkReferent" type="text" v-model="parkReferent"></p-inputtext>
+          <label for="parkReferent">Gestionnaire de Parc</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">assignment</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputtext id="BTNumber" type="text" v-model="BTNumber"></p-inputtext>
+          <label for="BTNumber">BT</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">info</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputtext id="note" type="text" v-model="note"></p-inputtext>
+          <label for="note">Informations complementaires</label>
         </p-floatlabel>
       </p-inputgroup>
 
@@ -100,8 +158,15 @@
         data() {
           const text1 = ref();
           const number = ref();
+          const contact = ref();
+          const employeeCode = ref();
+          const BTNumber = ref();
+          const email = ref();
+          const parkSize = ref();
+          const parkReferent = ref();
+          const note = ref();
 
-          return { user: null, text1, number };
+          return { user: null, text1, contact, number, employeeCode, email, parkSize, parkReferent, BTNumber, note };
         },
         mounted() {
           const clientId = window.APP_CONFIG?.GOOGLE_CLIENT_ID;
