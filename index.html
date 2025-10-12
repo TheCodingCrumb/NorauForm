@@ -60,7 +60,7 @@
           <i class="material-symbols-outlined">business_center</i>
         </p-inputgroupaddon>
         <p-floatlabel variant="on">
-          <p-inputtext id="raison_sociale" type="text" inputmode="text" v-model="text1"></p-inputtext>
+          <p-inputtext id="raison_sociale" type="text" inputmode="text" v-model="raison_sociale"></p-inputtext>
           <label for="raison_sociale">Raison Sociale</label>
         </p-floatlabel>
       </p-inputgroup>
@@ -146,6 +146,7 @@
       </p-inputgroup>
 
 
+      <p-button label="Envoyer" @click="submitForm"></p-button>
     </form>
   </p-panel>
 
@@ -156,17 +157,18 @@
     function initVue() {
       const app = createApp({
         data() {
-          const text1 = ref();
-          const number = ref();
-          const contact = ref();
-          const employeeCode = ref();
-          const BTNumber = ref();
-          const email = ref();
-          const parkSize = ref();
-          const parkReferent = ref();
-          const note = ref();
-
-          return { user: null, text1, contact, number, employeeCode, email, parkSize, parkReferent, BTNumber, note };
+          return {
+            user: null,
+            raison_sociale: null,
+            contact: null,
+            number: null,
+            employeeCode: null,
+            email: null,
+            parkSize: null,
+            parkReferent: null,
+            BTNumber: null,
+            note: null,
+          };
         },
         mounted() {
           const clientId = window.APP_CONFIG?.GOOGLE_CLIENT_ID;
@@ -175,16 +177,25 @@
             return;
           }
 
+          // 🔁 Récupère la session locale si elle existe
+          const savedUser = localStorage.getItem("google_user");
+          if (savedUser) {
+            this.user = JSON.parse(savedUser);
+          }
+
           google.accounts.id.initialize({
             client_id: clientId,
             callback: this.handleCredentialResponse,
+            auto_select: true,
           });
-          google.accounts.id.renderButton(
-            document.getElementById("g_id_signin"),
-            { theme: "outline", size: "large" }
-          );
+          
+          if (!this.user) {
+            google.accounts.id.renderButton(
+              document.getElementById("g_id_signin"),
+              { theme: "outline", size: "large" }
+            );
+          }
         },
-
         methods: {
           handleCredentialResponse(response) {
             const data = JSON.parse(atob(response.credential.split('.')[1]));
@@ -192,29 +203,67 @@
               name: data.name,
               email: data.email,
             };
+            
+            localStorage.setItem("google_user", JSON.stringify(this.user));
           },
           logout() {
-            // Désactive la connexion automatique
             google.accounts.id.disableAutoSelect();
-
-            // Efface l'utilisateur
             this.user = null;
-
-            // Supprime la session locale
             localStorage.removeItem("google_user");
 
-            // Attendre que Vue recrée le div
             this.$nextTick(() => {
               const signInDiv = document.getElementById("g_id_signin");
               if (signInDiv) {
-                signInDiv.innerHTML = ""; // vide l'ancien contenu
+                signInDiv.innerHTML = "";
                 google.accounts.id.renderButton(signInDiv, {
                   theme: "outline",
                   size: "large"
                 });
               }
             });
-          }
+          },
+          async submitForm() {
+            if (!this.user) {
+              alert("⚠️ Connecte-toi avec Google avant de soumettre le formulaire !");
+              return;
+            }
+
+            const scriptId = window.APP_CONFIG?.GOOGLE_SCRIPT_ID;
+            if (!scriptId) {
+              alert("❌ GOOGLE_SCRIPT_ID manquant dans config.js !");
+              return;
+            }
+
+            const payload = {
+              name: this.user?.name,
+              email: this.user?.email,
+              raison_sociale: this.raison_sociale,
+              telephone: this.telephone,
+              code_vendeur: this.code_vendeur,
+            };
+
+            console.log(payload)
+
+            try {
+              const response = await fetch(`https://script.google.com/macros/s/${scriptId}/exec`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+              });
+
+              const result = await response.json();
+              console.log(result);
+
+              if (result.status === "success") {
+                alert("✅ Formulaire envoyé avec succès !");
+                this.raison_sociale = this.telephone = this.code_vendeur = "";
+              } else {
+                alert("❌ Erreur lors de l'envoi : " + result.message);
+              }
+            } catch (err) {
+              alert("⚠️ Impossible d'envoyer les données : " + err.message);
+            }
+          },
         },
         components: {
           'p-card': PrimeVue.Card,
@@ -227,7 +276,8 @@
           'p-inputnumber': PrimeVue.InputNumber,
           'p-select': PrimeVue.Select,
           'p-icon': PrimeVue.Icon,
-          'p-datepicker': PrimeVue.DatePicker
+          'p-datepicker': PrimeVue.DatePicker,
+          'p-button': PrimeVue.Button,
         },
         directives: {
           "tooltip": PrimeVue.Tooltip,
@@ -242,7 +292,7 @@
       app.mount("#app");
     }
 
-    // 🔒 S’assurer que config.js est bien chargé avant Vue
+    // 🔒 S'assurer que config.js est bien chargé avant Vue
     if (window.APP_CONFIG?.GOOGLE_CLIENT_ID) {
       initVue();
     } else {
