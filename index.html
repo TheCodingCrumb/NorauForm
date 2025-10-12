@@ -1,48 +1,172 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/x-icon" href="/assets/norauto-favicon-16x16.png">
+  <link href="./style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
   <title>Connexion Google</title>
 
   <!-- Vue.js -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 
-  <!-- TailwindCSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PrimeVue UiKit -->
+  <script src="https://unpkg.com/primevue/umd/primevue.min.js"></script>
+  <script src="https://unpkg.com/@primevue/themes/umd/aura.min.js"></script>
 
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <!-- Config locale -->
   <script src="./config.js"></script>
+
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div id="app" class="bg-white p-8 rounded-2xl shadow-lg w-[400px] text-center">
-    <h1 class="text-2xl font-bold mb-6">Connexion Google</h1>
+<body id="app">
+  <p-toolbar class="flex">
+    <template #start>
+      <img width="180px" alt="Logo norauto"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Logo_actuel_de_Norauto.png/960px-Logo_actuel_de_Norauto.png">
+    </template>
+    <template #center>
+      <h1>Formulaire Civilité Professionnelle</h1>
+    </template>
+    <template #end>
+      <div v-if="!user">
+        <div id="g_id_signin"></div>
+      </div>
+      <div v-else class="connected-identity">
+        <div class="connected-identity__user">
+          Saisie en tant que : <span v-tooltip.top="user.email"> {{ user.name }}</span>
+        </div>
+        <button @click="logout">
+          Déconnexion
+        </button>
+      </div>
+    </template>
+  </p-toolbar>
 
-    <div v-if="!user">
-      <div id="g_id_signin"></div>
-    </div>
+  <div class="spacer"></div>
 
-    <div v-else>
-      <h2 class="text-xl font-semibold mb-2">{{ user.name }}</h2>
-      <p class="text-gray-600 mb-4">{{ user.email }}</p>
-      <button
-        @click="logout"
-        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-      >
-        Déconnexion
-      </button>
-    </div>
+  <p-panel header="Formulaire">
+    <form>
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">business_center</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputtext id="raison_sociale" type="text" inputmode="text" v-model="text1"></p-inputtext>
+          <label for="raison_sociale">Raison Sociale</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">face</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputtext id="contact" type="text" inputmode="text" v-model="contact"></p-inputtext>
+          <label for="contact">Interlocuteur</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">call</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputnumber id="telephone" type="tel" inputmode="tel" v-model="number"></p-inputnumber>
+          <label for="telephone">Telephone</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">badge</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputnumber id="code_vendeur" type="tel" inputmode="tel" v-model="employeeCode"></p-inputnumber>
+          <label for="code_vendeur">Code Vendeur</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">email</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputtext id="email" type="text" inputmode="email" v-model="email"></p-inputtext>
+          <label for="email">Email</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">traffic_jam</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputnumber id="parkSize" type="text" v-model="parkSize"></p-inputnumber>
+          <label for="parkSize">Taille de la flotte</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">passkey</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputtext id="parkReferent" type="text" v-model="parkReferent"></p-inputtext>
+          <label for="parkReferent">Gestionnaire de Parc</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">assignment</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputtext id="BTNumber" type="text" v-model="BTNumber"></p-inputtext>
+          <label for="BTNumber">BT</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-inputgroupaddon>
+          <i class="material-symbols-outlined">info</i>
+        </p-inputgroupaddon>
+        <p-floatlabel variant="on">
+          <p-inputtext id="note" type="text" v-model="note"></p-inputtext>
+          <label for="note">Informations complementaires</label>
+        </p-floatlabel>
+      </p-inputgroup>
+
+
+    </form>
+  </p-panel>
+
+
   <script>
-    const { createApp } = Vue;
+    const { createApp, ref } = Vue;
 
     function initVue() {
-      createApp({
+      const app = createApp({
         data() {
-          return { user: null };
+          const text1 = ref();
+          const number = ref();
+          const contact = ref();
+          const employeeCode = ref();
+          const BTNumber = ref();
+          const email = ref();
+          const parkSize = ref();
+          const parkReferent = ref();
+          const note = ref();
+
+          return { user: null, text1, contact, number, employeeCode, email, parkSize, parkReferent, BTNumber, note };
         },
         mounted() {
           const clientId = window.APP_CONFIG?.GOOGLE_CLIENT_ID;
@@ -55,12 +179,12 @@
             client_id: clientId,
             callback: this.handleCredentialResponse,
           });
-
           google.accounts.id.renderButton(
             document.getElementById("g_id_signin"),
             { theme: "outline", size: "large" }
           );
         },
+
         methods: {
           handleCredentialResponse(response) {
             const data = JSON.parse(atob(response.credential.split('.')[1]));
@@ -92,7 +216,30 @@
             });
           }
         },
-      }).mount("#app");
+        components: {
+          'p-card': PrimeVue.Card,
+          'p-toolbar': PrimeVue.Toolbar,
+          'p-panel': PrimeVue.Panel,
+          'p-inputgroup': PrimeVue.InputGroup,
+          'p-inputgroupaddon': PrimeVue.InputGroupAddon,
+          'p-inputtext': PrimeVue.InputText,
+          'p-floatlabel': PrimeVue.FloatLabel,
+          'p-inputnumber': PrimeVue.InputNumber,
+          'p-select': PrimeVue.Select,
+          'p-icon': PrimeVue.Icon,
+          'p-datepicker': PrimeVue.DatePicker
+        },
+        directives: {
+          "tooltip": PrimeVue.Tooltip,
+        },
+      });
+
+      app.use(PrimeVue.Config, {
+        theme: {
+          preset: PrimeVue.Themes.Aura,
+        },
+      });
+      app.mount("#app");
     }
 
     // 🔒 S’assurer que config.js est bien chargé avant Vue
@@ -107,4 +254,5 @@
     }
   </script>
 </body>
+
 </html>
