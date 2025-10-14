@@ -26,15 +26,16 @@ window.Form = {
       }
 
       const payload = {
-        name: this.$root.user.name,
-        email: this.$root.user.email,
+        contact: this.contact,
+        email: this.email,
         raison_sociale: this.raison_sociale,
         telephone: this.number,
-        code_vendeur: this.employeeCode,
+        employeeCode: this.employeeCode,
         parkSize: this.parkSize,
         parkReferent: this.parkReferent,
-        BTNumber: this.BTNumber,
+        btNumber: this.btNumber,
         note: this.note,
+        authorEmail: this.$root.user.email,
       };
 
       try {
@@ -66,18 +67,19 @@ window.Form = {
           { icon: 'business_center', id: 'raison_sociale', label: 'Raison Sociale', model: 'raison_sociale' },
           { icon: 'face', id: 'contact', label: 'Interlocuteur', model: 'contact' },
           { icon: 'call', id: 'telephone', label: 'Téléphone', model: 'number' },
-          { icon: 'badge', id: 'code_vendeur', label: 'Code Vendeur', model: 'employeeCode' },
+          { icon: 'badge', id: 'employeeCode', label: 'Code Vendeur', model: 'employeeCode' },
           { icon: 'email', id: 'email', label: 'Email', model: 'email' },
           { icon: 'traffic_jam', id: 'parkSize', label: 'Taille de la flotte', model: 'parkSize' },
           { icon: 'passkey', id: 'parkReferent', label: 'Gestionnaire de Parc', model: 'parkReferent' },
-          { icon: 'assignment', id: 'BTNumber', label: 'BT', model: 'BTNumber' },
+          { icon: 'assignment', id: 'btNumber', label: 'BT', model: 'btNumber' },
           { icon: 'info', id: 'note', label: 'Informations complémentaires', model: 'note' }
         ]" :key="key">
           <p-inputgroupaddon>
             <i class="material-symbols-outlined">{{ field.icon }}</i>
           </p-inputgroupaddon>
           <p-floatlabel variant="on">
-            <p-inputtext :id="field.id" v-model="this[field.model]"></p-inputtext>
+            <!-- TODO: tag must be dynamic -->
+            <p-inputtext :id="field.id" v-model="this[field.model]"></p-inputtext> 
             <label :for="field.id">{{ field.label }}</label>
           </p-floatlabel>
         </p-inputgroup>
