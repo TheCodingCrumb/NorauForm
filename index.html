@@ -6,303 +6,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/x-icon" href="/assets/norauto-favicon-16x16.png">
   <link href="./style.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
 
   <title>Connexion Google</title>
 
   <!-- Vue.js -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-
   <!-- PrimeVue UiKit -->
   <script src="https://unpkg.com/primevue/umd/primevue.min.js"></script>
   <script src="https://unpkg.com/@primevue/themes/umd/aura.min.js"></script>
-
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-
+  <script src="https://accounts.google.com/gsi/client"></script>
   <!-- Config locale -->
   <script src="./config.js"></script>
-
+  <!-- Components -->
+  <script src="./components/Toolbar.js"></script>
+  <script src="./components/Form.js"></script>
+  <!-- App -->
+  <script src="./app.js"></script>
 </head>
 
 <body id="app">
-  <p-toolbar class="flex">
-    <template #start>
-      <img width="180px" alt="Logo norauto"
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Logo_actuel_de_Norauto.png/960px-Logo_actuel_de_Norauto.png">
-    </template>
-    <template #center>
-      <h1>Formulaire Civilité Professionnelle</h1>
-    </template>
-    <template #end>
-      <div v-if="!user">
-        <div id="g_id_signin"></div>
-      </div>
-      <div v-else class="connected-identity">
-        <div class="connected-identity__user">
-          Saisie en tant que : <span v-tooltip.top="user.email"> {{ user.name }}</span>
-        </div>
-        <button @click="logout">
-          Déconnexion
-        </button>
-      </div>
-    </template>
-  </p-toolbar>
-
+  <noro-toolbar></noro-toolbar>
   <div class="spacer"></div>
-
-  <p-panel header="Formulaire">
-    <form>
-      <p-inputgroup>
-        <p-inputgroupaddon>
-          <i class="material-symbols-outlined">business_center</i>
-        </p-inputgroupaddon>
-        <p-floatlabel variant="on">
-          <p-inputtext id="raison_sociale" type="text" inputmode="text" v-model="raison_sociale"></p-inputtext>
-          <label for="raison_sociale">Raison Sociale</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-      <p-inputgroup>
-        <p-inputgroupaddon>
-          <i class="material-symbols-outlined">face</i>
-        </p-inputgroupaddon>
-        <p-floatlabel variant="on">
-          <p-inputtext id="contact" type="text" inputmode="text" v-model="contact"></p-inputtext>
-          <label for="contact">Interlocuteur</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-      <p-inputgroup>
-        <p-inputgroupaddon>
-          <i class="material-symbols-outlined">call</i>
-        </p-inputgroupaddon>
-        <p-floatlabel variant="on">
-          <p-inputnumber id="telephone" type="tel" inputmode="tel" v-model="number"></p-inputnumber>
-          <label for="telephone">Telephone</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-      <p-inputgroup>
-        <p-inputgroupaddon>
-          <i class="material-symbols-outlined">badge</i>
-        </p-inputgroupaddon>
-        <p-floatlabel variant="on">
-          <p-inputnumber id="code_vendeur" type="tel" inputmode="tel" v-model="employeeCode"></p-inputnumber>
-          <label for="code_vendeur">Code Vendeur</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-      <p-inputgroup>
-        <p-inputgroupaddon>
-          <i class="material-symbols-outlined">email</i>
-        </p-inputgroupaddon>
-        <p-floatlabel variant="on">
-          <p-inputtext id="email" type="text" inputmode="email" v-model="email"></p-inputtext>
-          <label for="email">Email</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-      <p-inputgroup>
-        <p-inputgroupaddon>
-          <i class="material-symbols-outlined">traffic_jam</i>
-        </p-inputgroupaddon>
-        <p-floatlabel variant="on">
-          <p-inputnumber id="parkSize" type="text" v-model="parkSize"></p-inputnumber>
-          <label for="parkSize">Taille de la flotte</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-      <p-inputgroup>
-        <p-inputgroupaddon>
-          <i class="material-symbols-outlined">passkey</i>
-        </p-inputgroupaddon>
-        <p-floatlabel variant="on">
-          <p-inputtext id="parkReferent" type="text" v-model="parkReferent"></p-inputtext>
-          <label for="parkReferent">Gestionnaire de Parc</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-      <p-inputgroup>
-        <p-inputgroupaddon>
-          <i class="material-symbols-outlined">assignment</i>
-        </p-inputgroupaddon>
-        <p-floatlabel variant="on">
-          <p-inputtext id="BTNumber" type="text" v-model="BTNumber"></p-inputtext>
-          <label for="BTNumber">BT</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-      <p-inputgroup>
-        <p-inputgroupaddon>
-          <i class="material-symbols-outlined">info</i>
-        </p-inputgroupaddon>
-        <p-floatlabel variant="on">
-          <p-inputtext id="note" type="text" v-model="note"></p-inputtext>
-          <label for="note">Informations complementaires</label>
-        </p-floatlabel>
-      </p-inputgroup>
-
-
-      <p-button label="Envoyer" @click="submitForm"></p-button>
-    </form>
-  </p-panel>
-
-
-  <script>
-    const { createApp, ref } = Vue;
-
-    function initVue() {
-      const app = createApp({
-        data() {
-          return {
-            user: null,
-            raison_sociale: null,
-            contact: null,
-            number: null,
-            employeeCode: null,
-            email: null,
-            parkSize: null,
-            parkReferent: null,
-            BTNumber: null,
-            note: null,
-          };
-        },
-        mounted() {
-          const clientId = window.APP_CONFIG?.GOOGLE_CLIENT_ID;
-          if (!clientId) {
-            alert("❌ GOOGLE_CLIENT_ID manquant dans config.js !");
-            return;
-          }
-
-          // 🔁 Récupère la session locale si elle existe
-          const savedUser = localStorage.getItem("google_user");
-          if (savedUser) {
-            this.user = JSON.parse(savedUser);
-          }
-
-          google.accounts.id.initialize({
-            client_id: clientId,
-            callback: this.handleCredentialResponse,
-            auto_select: true,
-          });
-          
-          if (!this.user) {
-            google.accounts.id.renderButton(
-              document.getElementById("g_id_signin"),
-              { theme: "outline", size: "large" }
-            );
-          }
-        },
-        methods: {
-          handleCredentialResponse(response) {
-            const data = JSON.parse(atob(response.credential.split('.')[1]));
-            this.user = {
-              name: data.name,
-              email: data.email,
-            };
-            
-            localStorage.setItem("google_user", JSON.stringify(this.user));
-          },
-          logout() {
-            google.accounts.id.disableAutoSelect();
-            this.user = null;
-            localStorage.removeItem("google_user");
-
-            this.$nextTick(() => {
-              const signInDiv = document.getElementById("g_id_signin");
-              if (signInDiv) {
-                signInDiv.innerHTML = "";
-                google.accounts.id.renderButton(signInDiv, {
-                  theme: "outline",
-                  size: "large"
-                });
-              }
-            });
-          },
-          async submitForm() {
-            if (!this.user) {
-              alert("⚠️ Connecte-toi avec Google avant de soumettre le formulaire !");
-              return;
-            }
-
-            const scriptId = window.APP_CONFIG?.GOOGLE_SCRIPT_ID;
-            if (!scriptId) {
-              alert("❌ GOOGLE_SCRIPT_ID manquant dans config.js !");
-              return;
-            }
-
-            const payload = {
-              name: this.user?.name,
-              email: this.user?.email,
-              raison_sociale: this.raison_sociale,
-              telephone: this.telephone,
-              code_vendeur: this.code_vendeur,
-            };
-
-            console.log(payload)
-
-            try {
-              const response = await fetch(`https://script.google.com/macros/s/${scriptId}/exec`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-              });
-
-              const result = await response.json();
-              console.log(result);
-
-              if (result.status === "success") {
-                alert("✅ Formulaire envoyé avec succès !");
-                this.raison_sociale = this.telephone = this.code_vendeur = "";
-              } else {
-                alert("❌ Erreur lors de l'envoi : " + result.message);
-              }
-            } catch (err) {
-              alert("⚠️ Impossible d'envoyer les données : " + err.message);
-            }
-          },
-        },
-        components: {
-          'p-card': PrimeVue.Card,
-          'p-toolbar': PrimeVue.Toolbar,
-          'p-panel': PrimeVue.Panel,
-          'p-inputgroup': PrimeVue.InputGroup,
-          'p-inputgroupaddon': PrimeVue.InputGroupAddon,
-          'p-inputtext': PrimeVue.InputText,
-          'p-floatlabel': PrimeVue.FloatLabel,
-          'p-inputnumber': PrimeVue.InputNumber,
-          'p-select': PrimeVue.Select,
-          'p-icon': PrimeVue.Icon,
-          'p-datepicker': PrimeVue.DatePicker,
-          'p-button': PrimeVue.Button,
-        },
-        directives: {
-          "tooltip": PrimeVue.Tooltip,
-        },
-      });
-
-      app.use(PrimeVue.Config, {
-        theme: {
-          preset: PrimeVue.Themes.Aura,
-        },
-      });
-      app.mount("#app");
-    }
-
-    // 🔒 S'assurer que config.js est bien chargé avant Vue
-    if (window.APP_CONFIG?.GOOGLE_CLIENT_ID) {
-      initVue();
-    } else {
-      // Si config.js charge après ce script
-      window.addEventListener("load", () => {
-        if (window.APP_CONFIG?.GOOGLE_CLIENT_ID) initVue();
-        else alert("❌ Impossible de charger config.js !");
-      });
-    }
-  </script>
+  <noro-form></noro-form>
 </body>
 
 </html>
