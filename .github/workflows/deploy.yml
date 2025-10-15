@@ -24,10 +24,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Inject secret into config.js
         env:
-          GGL_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GGL_CL_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GGL_SC_ID: ${{ secrets.GOOGLE_SCRIPT_ID }}
         run: |
           cp config.js.dist config.js
-          sed -i "s|xxx.apps.googleusercontent.com|$GGL_ID|" config.js
+          sed -i "s|xxx.apps.googleusercontent.com|$GGL_CL_ID|" config.js
+          sed -i "s|xxx.script.googleusercontent.com|$GGL_SC_ID|" config.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

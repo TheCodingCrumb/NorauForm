@@ -1,4 +1,4 @@
 window.APP_CONFIG = {
   GOOGLE_CLIENT_ID: "xxx.apps.googleusercontent.com",
-  GOOGLE_SCRIPT_ID: "AAAAAAAAAAAAAAAAAAAAAHHHHHHHHH",
+  GOOGLE_SCRIPT_ID: "xxx.script.googleusercontent.com",
 };
