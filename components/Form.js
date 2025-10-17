@@ -61,7 +61,7 @@ window.Form = {
     },
   },
   template: `
-    <p-panel header="Formulaire">
+    <p-panel header="Formulaire" :class="$root.user === null ? 'form-blur' : ''">
       <form @submit.prevent="submitForm">
         <p-inputgroup v-for="(field, key) in [
           { icon: 'business_center', id: 'raison_sociale', label: 'Raison Sociale', model: 'raison_sociale' },
