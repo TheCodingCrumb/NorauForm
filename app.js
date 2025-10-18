@@ -17,14 +17,11 @@ const app = createApp({
     google.accounts.id.initialize({
       client_id: clientId,
       callback: this.handleCredentialResponse,
-      auto_select: true,
+      auto_select: false,
     });
 
     if (!this.user) {
-      google.accounts.id.renderButton(
-        document.getElementById("g_id_signin"),
-        { theme: "outline", size: "large" }
-      );
+      this.renderGoogleButton()
     }
   },
   methods: {
@@ -37,17 +34,22 @@ const app = createApp({
       google.accounts.id.disableAutoSelect();
       this.user = null;
       localStorage.removeItem("google_user");
-      this.$nextTick(() => {
-        const signInDiv = document.getElementById("g_id_signin");
-        if (signInDiv) {
-          signInDiv.innerHTML = "";
-          google.accounts.id.renderButton(signInDiv, {
-            theme: "outline",
-            size: "large"
-          });
-        }
-      });
+      this.$nextTick(() => this.renderGoogleButton());
     },
+    renderGoogleButton() {
+      const signInDiv = document.getElementById("g_id_signin");
+      if (signInDiv) {
+        signInDiv.innerHTML = "";
+        google.accounts.id.renderButton(signInDiv, {
+          theme: "outline",
+          size: "large",
+          text: "signin",
+          shape: "pill",
+          logo_alignment: "center",
+        }
+        );
+      }
+    }
   },
 });
 
@@ -67,8 +69,11 @@ app.component("p-inputtext", PrimeVue.InputText);
 app.component("p-floatlabel", PrimeVue.FloatLabel);
 app.component("p-inputnumber", PrimeVue.InputNumber);
 app.component("p-select", PrimeVue.Select);
+app.component("p-avatar", PrimeVue.Avatar);
 app.component("p-icon", PrimeVue.Icon);
 app.component("p-datepicker", PrimeVue.DatePicker);
 app.component("p-button", PrimeVue.Button);
+
+app.directive("tooltip", PrimeVue.Tooltip);
 
 app.mount("#app");
