@@ -58,22 +58,26 @@ app.use(PrimeVue.Config, {
 });
 
 // Composants
-app.component("noro-toolbar", window.Toolbar);
 app.component("noro-form", window.Form);
+app.component("noro-toolbar", window.Toolbar);
+
+// PrimeVue Import
+app.component("p-avatar", PrimeVue.Avatar);
 app.component("p-card", PrimeVue.Card);
-app.component("p-toolbar", PrimeVue.Toolbar);
-app.component("p-panel", PrimeVue.Panel);
+app.component("p-button", PrimeVue.Button);
+app.component("p-floatlabel", PrimeVue.FloatLabel);
+app.component("p-icon", PrimeVue.Icon);
 app.component("p-inputgroup", PrimeVue.InputGroup);
 app.component("p-inputgroupaddon", PrimeVue.InputGroupAddon);
-app.component("p-inputtext", PrimeVue.InputText);
-app.component("p-floatlabel", PrimeVue.FloatLabel);
+app.component("p-inputmask", PrimeVue.InputMask);
 app.component("p-inputnumber", PrimeVue.InputNumber);
+app.component("p-inputtext", PrimeVue.InputText);
+app.component("p-panel", PrimeVue.Panel);
 app.component("p-select", PrimeVue.Select);
-app.component("p-avatar", PrimeVue.Avatar);
-app.component("p-icon", PrimeVue.Icon);
-app.component("p-datepicker", PrimeVue.DatePicker);
-app.component("p-button", PrimeVue.Button);
+app.component("p-textarea", PrimeVue.Textarea);
+app.component("p-toolbar", PrimeVue.Toolbar);
 
+// Directives
 app.directive("tooltip", PrimeVue.Tooltip);
 
 app.mount("#app");

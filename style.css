@@ -20,18 +20,23 @@ html {
   text-align: right;
 }
 
-.spacer{
+fieldset {
+  border: none;
+}
+
+.spacer {
   margin: 15px 0;
 }
 
 .form-blur {
   position: relative;
 }
+
 .form-blur::before {
   content: "";
   position: absolute;
   inset: 5px;
   backdrop-filter: blur(5px);
-  pointer-events: all; 
+  pointer-events: all;
   z-index: 10;
 }
