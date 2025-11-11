@@ -14,7 +14,7 @@ export const FormElement = defineComponent({
   emits: ["update:modelValue"],
   setup(_, { emit }) {
     const onInput = (e) => {
-      emit("update:modelValue", e.target.value);
+      emit("update:modelValue", e);
     };
 
     return { onInput };
@@ -28,22 +28,22 @@ export const FormElement = defineComponent({
 
             <p-floatlabel variant="on">
                 <p-inputtext v-if="type==='text'" :id="id" :type="type"
-                    :value="modelValue" @input="onInput"
+                    :value="modelValue" :onInput="(e) => onInput(e.target.value)"
                     :invalid="!!error"
                 ></p-inputtext>
 
                 <p-inputnumber v-else-if="type==='number'" :id="id"
-                    :value="modelValue" @input="onInput"
+                    :value="modelValue" @update:modelValue="onInput"
                     :invalid="!!error"
                 ></p-inputnumber>
 
                 <p-inputmask v-else-if="type==='mask'" :id="id" :mask="mask"
-                    :value="modelValue" @input="onInput"
+                    :value="modelValue" @update:modelValue="onInput"
                     :invalid="!!error"
                 ></p-inputmask>
 
                 <p-textarea v-else-if="type==='textarea'" :id="id"
-                    :value="modelValue" @input="onInput"
+                    :value="modelValue" :onInput="(e) => onInput(e.target.value)"
                     fluid autoResize
                     :invalid="!!error"
                 ></p-textarea>
