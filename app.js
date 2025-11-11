@@ -1,3 +1,6 @@
+import { Toolbar } from './components/Toolbar.js';
+import { Form } from './components/Form.js';
+
 class AuthorizationStatus {
   static Visitor = new AuthorizationStatus("visitor");
   static Authorized = new AuthorizationStatus("authorized");
@@ -39,11 +42,11 @@ const app = createApp({
   },
   methods: {
     async setUser(user) {
+      this.user = user;
       if (user?.email == null) {
         this.isAuthorized = AuthorizationStatus.Visitor;
         return;
       }
-      this.user = user;
       this.isAuthorized = await this.canConnect(user.email) ? AuthorizationStatus.Authorized : AuthorizationStatus.Unauthorized;
     },
     async canConnect(email) {
@@ -117,7 +120,6 @@ const app = createApp({
     logout() {
       google.accounts.id.disableAutoSelect();
       this.setUser(null);
-      this.user = null;
       localStorage.removeItem("google_user");
       this.$nextTick(() => this.renderGoogleButton());
     },
@@ -145,8 +147,8 @@ app.use(PrimeVue.Config, {
 app.use(PrimeVue.ToastService);
 
 // Composants
-app.component("noro-form", window.Form);
-app.component("noro-toolbar", window.Toolbar);
+app.component("noro-form", Form);
+app.component("noro-toolbar", Toolbar);
 
 // PrimeVue Import
 app.component("p-avatar", PrimeVue.Avatar);

@@ -1,6 +1,13 @@
-window.Form = {
-    data() {
-        return {
+const { defineComponent, ref, reactive } = Vue;
+import { FormElement } from './FormElement.js';
+
+export const Form = defineComponent({
+    name: "Form",
+    components: { FormElement },
+    setup() {
+        const root = Vue.getCurrentInstance().proxy.$root;
+
+        const form = reactive({
             raison_sociale: "",
             contact: "",
             number: "",
@@ -10,12 +17,37 @@ window.Form = {
             parkReferent: "",
             BTNumber: "",
             note: "",
-            isSubmiting: false,
+        });
+
+        const isSubmiting = ref(false);
+
+        const errors = reactive({});
+
+        const validateForm = () => {
+            errors.raison_sociale = "";
+            errors.number = "";
+            errors.email = "";
+
+            let valid = true;
+
+            if (!form.raison_sociale.trim()) {
+                errors.raison_sociale = "Raison sociale requise";
+                valid = false;
+            }
+
+            if (!form.number.trim() && !form.email.trim()) {
+                errors.number = "Téléphone ou Email requis";
+                errors.email = "Téléphone ou Email requis";
+                valid = false;
+            }
+
+            return valid;
         };
-    },
-    methods: {
-        async submitForm() {
-            if (!this.$root.user) {
+
+        const submitForm = async () => {
+            if (!validateForm()) return;
+
+            if (!root.user) {
                 alert("⚠️ Connecte-toi avec Google avant de soumettre le formulaire !");
                 return;
             }
@@ -26,20 +58,20 @@ window.Form = {
                 return;
             }
 
-            this.isSubmiting = true;
+            isSubmiting.value = true;
 
             const payload = {
                 route: "submit-form",
-                contact: this.contact,
-                email: this.email,
-                raison_sociale: this.raison_sociale,
-                telephone: this.number,
-                employeeCode: this.employeeCode,
-                parkSize: this.parkSize,
-                parkReferent: this.parkReferent,
-                btNumber: this.btNumber,
-                note: this.note,
-                authorEmail: this.$root.user.email,
+                contact: form.contact,
+                email: form.email,
+                raison_sociale: form.raison_sociale,
+                telephone: form.number,
+                employeeCode: form.employeeCode,
+                parkSize: form.parkSize,
+                parkReferent: form.parkReferent,
+                btNumber: form.BTNumber,
+                note: form.note,
+                authorEmail: root.user.email,
             };
 
             try {
@@ -54,15 +86,15 @@ window.Form = {
 
                 const result = await response.json();
                 if (result.code === 200) {
-                    this.$toast.add({
+                    root.$toast.add({
                         severity: "success",
                         summary: "Succès",
                         detail: result.message,
                         life: 10000,
                     });
-                    Object.keys(this.$data).forEach(k => this[k] = ""); // reset
+                    Object.keys(form).forEach(k => form[k] = "");
                 } else {
-                    this.$toast.add({
+                    root.$toast.add({
                         severity: "error",
                         summary: "Erreur",
                         detail: result.message,
@@ -70,143 +102,125 @@ window.Form = {
                     });
                 }
             } catch (err) {
-                this.$toast.add({
+                root.$toast.add({
                     severity: "error",
                     summary: "Erreur",
                     detail: err.message,
                     life: 10000,
                 });
             } finally {
-                this.isSubmiting = false;
+                isSubmiting.value = false;
             }
-        },
+        };
+
+        return { form, errors, isSubmiting, submitForm };
     },
+
     template: `
-    <template v-if="$root.loading">
-        <p-panel>
-            <p-skeleton width="10rem" class="mb-2"></p-skeleton>
-            <p-skeleton width="5rem" class="mb-2"></p-skeleton>
-            <p-skeleton height="2rem" class="mb-2"></p-skeleton>
-            <p-skeleton width="10rem" class="mb-2"></p-skeleton>
-            <p-skeleton width="5rem" class="mb-2"></p-skeleton>
-            <p-skeleton height="2rem" class="mb-2"></p-skeleton>
-        </p-panel>
-    </template>
-    <template v-else-if="$root.isAuthorized.name === 'authorized'">
-        <p-panel>
-            <form @submit.prevent="submitForm">
-                <fieldset :disabled="$root.user === null">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 10px; row-gap: 15px;">
-                            <p-inputgroup>
-                                <p-inputgroupaddon>
-                                    <i class="pi pi-briefcase"></i>
-                                </p-inputgroupaddon>
-                                <p-floatlabel variant="on">
-                                    <p-inputtext id="raison_sociale" type="text" inputmode="text" v-model="raison_sociale"></p-inputtext>
-                                    <label for="raison_sociale">Raison Sociale</label>
-                                </p-floatlabel>
-                            </p-inputgroup>
-                        <p-inputgroup>
-                            <p-inputgroupaddon>
-                                <i class="material-symbols-outlined">badge</i>
-                            </p-inputgroupaddon>
-                            <p-floatlabel variant="on">
-                                <p-inputmask id="code_vendeur" mask="9?9" v-model="employeeCode"></p-inputmask>
-                                <label for="code_vendeur">Code Vendeur</label>
-                            </p-floatlabel>
-                        </p-inputgroup>
-                        <p-inputgroup>
-                            <p-inputgroupaddon>
-                                <i class="material-symbols-outlined">assignment</i>
-                            </p-inputgroupaddon>
-                            <p-floatlabel variant="on">
-                                <p-inputmask id="BTNumber" type="text" mask="9?999" v-model="BTNumber"></p-inputmask>
-                                <label for="BTNumber">BT</label>
-                            </p-floatlabel>
-                        </p-inputgroup>
-                        <p-inputgroup>
-                            <p-inputgroupaddon>
-                                <i class="material-symbols-outlined">face</i>
-                            </p-inputgroupaddon>
-                            <p-floatlabel variant="on">
-                                <p-inputtext id="contact" type="text" inputmode="text" v-model="contact"></p-inputtext>
-                                <label for="contact">Interlocuteur</label>
-                            </p-floatlabel>
-                        </p-inputgroup>
-                        <p-inputgroup>
-                            <p-inputgroupaddon>
-                                <i class="material-symbols-outlined">passkey</i>
-                            </p-inputgroupaddon>
-                            <p-floatlabel variant="on">
-                                <p-inputtext id="parkReferent" type="text" v-model="parkReferent"></p-inputtext>
-                                <label for="parkReferent">Gestionnaire de Parc</label>
-                            </p-floatlabel>
-                        </p-inputgroup>
-            
-                        <p-inputgroup>
-                            <p-inputgroupaddon>
-                                <i class="material-symbols-outlined">traffic_jam</i>
-                            </p-inputgroupaddon>
-                            <p-floatlabel variant="on">
-                                <p-inputnumber id="parkSize" type="text" v-model="parkSize"></p-inputnumber>
-                                <label for="parkSize">Taille de la flotte</label>
-                            </p-floatlabel>
-                        </p-inputgroup>
-            
-                        <div>
-                            <p-inputgroup>
-                                <p-inputgroupaddon>
-                                    <i class="material-symbols-outlined">call</i>
-                                </p-inputgroupaddon>
-                                <p-floatlabel variant="on">
-                                    <p-inputmask id="telephone" type="tel" mask="99 99 99 99 99 ?9999" v-model="number"></p-inputmask>
-                                    <label for="telephone">Telephone</label>
-                                </p-floatlabel>
-                            </p-inputgroup>
-                        </div>
-                        <div style="grid-column-start: 2;grid-column-end: 4;">
-                            <p-inputgroup>
-                                <p-inputgroupaddon>
-                                    <i class="material-symbols-outlined">email</i>
-                                </p-inputgroupaddon>
-                                <p-floatlabel variant="on">
-                                    <p-inputtext id="email" type="text" inputmode="email" v-model="email"></p-inputtext>
-                                    <label for="email">Email</label>
-                                </p-floatlabel>
-                            </p-inputgroup>
-                        </div>
-                        <div style="grid-column-start: 1;grid-column-end: 4;">
-                            <p-inputgroup>
-                                <p-inputgroupaddon>
-                                    <i class="material-symbols-outlined">info</i>
-                                </p-inputgroupaddon>
-                                <p-floatlabel variant="on">
-                                    <p-textarea id="note" type="text" v-model="note" fluid autoResize></p-textarea>
-                                    <label for="note">Informations complementaires</label>
-                                </p-floatlabel>
-                            </p-inputgroup>
-                        </div>
+    <p-panel v-if="$root.isAuthorized.name === 'authorized'">
+        <form @submit.prevent="submitForm">
+            <fieldset :disabled="$root.user === null">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 10px; row-gap: 15px; align-items: baseline;">
+                    <!-- Raison Sociale -->
+                    <FormElement 
+                        v-model="form.raison_sociale"
+                        id="raison_sociale"
+                        label="Raison Sociale *"
+                        icon="business_center"
+                        type="text"
+                        :error="errors.raison_sociale"
+                    />
+                    <!-- Code vendeur -->
+                    <FormElement 
+                        v-model="form.code_vendeur"
+                        id="code_vendeur"
+                        label="Code Vendeur"
+                        icon="badge"
+                        type="mask"
+                        mask="9?9"
+                    />
+                    <!-- BTNumber -->
+                    <FormElement 
+                        v-model="form.BTNumber"
+                        id="BTNumber"
+                        label="BT"
+                        icon="assignment"
+                        type="mask"
+                        mask="9?999"
+                    />
+                    <!-- Interlocuteur -->
+                    <FormElement 
+                        v-model="form.contact"
+                        id="contact"
+                        label="Interlocuteur"
+                        icon="face"
+                        type="text"
+                    />
+                    <!-- Gestionnaire de Parc -->
+                    <FormElement 
+                        v-model="form.parkReferent"
+                        id="parkReferent"
+                        label="Gestionnaire de Parc"
+                        icon="passkey"
+                        type="text"
+                    />
+                    <!-- Taille de la Flotte -->
+                    <FormElement 
+                        v-model="form.parkSize"
+                        id="parkSize"
+                        label="Taille de la Flotte"
+                        icon="traffic_jam"
+                        type="number"
+                    />
+                    <!-- Téléphone -->
+                    <FormElement 
+                        v-model="form.number"
+                        id="telephone"
+                        label="Téléphone"
+                        icon="call"
+                        type="mask"
+                        mask="99 99 99 99 99 ?9999"
+                        :error="errors.number"
+                    />
+                    <!-- Email -->
+                    <div style="grid-column-start: 2; grid-column-end: 4;">
+                        <FormElement 
+                            v-model="form.email"
+                            id="email"
+                            label="Email"
+                            icon="email"
+                            type="text"
+                            :error="errors.email"
+                        />
                     </div>
-                    <div class="spacer"></div>
-                    <div style="text-align: end">
-                        <p-button label="Envoyer" type="submit" icon="pi pi-search" :loading="isSubmiting"></p-button>
+                    <!-- Note -->
+                    <div style="grid-column-start: 1; grid-column-end: 4;">
+                        <FormElement 
+                            v-model="form.note"
+                            id="note"
+                            label="Informations complémentaires"
+                            icon="info"
+                            type="textarea"
+                        />
                     </div>
-                </fieldset>
-            </form>
-        </p-panel>
-    </template>
-    <template v-else>
-        <p-panel class="form-blur">
-            <p-message class="over-display" severity="contrast" size="large" variant="outlined">
-                {{ $root.isAuthorized.name === 'unauthorized' ? "Vous n'avez pas l'accès à cette fonctionnalité" : "Veuillez vous identifier avant de continuer" }}
-            </p-message>
-            <p-skeleton animation="none" width="10rem" class="mb-2"></p-skeleton>
-            <p-skeleton animation="none" width="5rem" class="mb-2"></p-skeleton>
-            <p-skeleton animation="none" height="2rem" class="mb-2"></p-skeleton>
-            <p-skeleton animation="none" width="10rem" class="mb-2"></p-skeleton>
-            <p-skeleton animation="none" width="5rem" class="mb-2"></p-skeleton>
-            <p-skeleton animation="none" height="2rem" class="mb-2"></p-skeleton>
-        </p-panel>
-    </template>
-  `,
-};
+                </div>
+
+                <div style="text-align: end; margin-top: 1rem;">
+                    <p-button label="Envoyer" type="submit" icon="pi pi-send" :loading="isSubmiting"></p-button>
+                </div>
+            </fieldset>
+        </form>
+    </p-panel>
+    <p-panel v-else class="form-blur">
+        <p-message v-if="!$root.loading" class="over-display" severity="contrast" size="large" variant="outlined">
+            {{ $root.isAuthorized.name === 'unauthorized' ? "Vous n'avez pas l'accès à cette fonctionnalité" : "Veuillez vous identifier avant de continuer" }}
+        </p-message>
+        <p-skeleton :animation="$root.loading ? '' : 'none'" width="10rem" class="mb-2"></p-skeleton>
+        <p-skeleton :animation="$root.loading ? '' : 'none'" width="5rem" class="mb-2"></p-skeleton>
+        <p-skeleton :animation="$root.loading ? '' : 'none'" height="2rem" class="mb-2"></p-skeleton>
+        <p-skeleton :animation="$root.loading ? '' : 'none'" width="10rem" class="mb-2"></p-skeleton>
+        <p-skeleton :animation="$root.loading ? '' : 'none'" width="5rem" class="mb-2"></p-skeleton>
+        <p-skeleton :animation="$root.loading ? '' : 'none'" height="2rem" class="mb-2"></p-skeleton>
+    </p-panel>
+    `
+});

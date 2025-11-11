@@ -1,4 +1,7 @@
-window.Toolbar = {
+const { defineComponent } = Vue;
+
+export const Toolbar = defineComponent({
+  name: "Toolbar",
   template: `
     <p-toolbar class="flex">
       <template #start>
@@ -27,4 +30,4 @@ window.Toolbar = {
       </template>
     </p-toolbar>
   `,
-};
+});
