@@ -13,6 +13,7 @@ const app = createApp({
   data() {
     return {
       user: null,
+      loading: false,
       isAuthorized: AuthorizationStatus.Visitor,
     };
   },
@@ -24,7 +25,7 @@ const app = createApp({
     }
 
     const savedUser = localStorage.getItem("google_user");
-    if (savedUser) this.user = JSON.parse(savedUser);
+    if (savedUser) this.setUser(JSON.parse(savedUser));
 
     google.accounts.id.initialize({
       client_id: clientId,
@@ -37,6 +38,14 @@ const app = createApp({
     }
   },
   methods: {
+    async setUser(user) {
+      if (user?.email == null) {
+        this.isAuthorized = AuthorizationStatus.Visitor;
+        return;
+      }
+      this.user = user;
+      this.isAuthorized = await this.canConnect(user.email) ? AuthorizationStatus.Authorized : AuthorizationStatus.Unauthorized;
+    },
     async canConnect(email) {
       const payload = {
         route: "form-authorization",
@@ -50,6 +59,9 @@ const app = createApp({
           alert("❌ GOOGLE_SCRIPT_ID manquant dans config.js !");
           return;
         }
+
+        this.loading = true;
+
         const response = await fetch(
           `https://script.google.com/macros/s/${scriptId}/exec`,
           {
@@ -91,24 +103,20 @@ const app = createApp({
           detail: err.message,
           life: 10000,
         });
+      } finally {
+        this.loading = false;
       }
       return false;
     },
 
     async handleCredentialResponse(response) {
       const data = JSON.parse(atob(response.credential.split('.')[1]));
-      const isAuthorized = await this.canConnect(data.email);
-
-      if (isAuthorized) {
-        this.isAuthorized = AuthorizationStatus.Authorized;
-      } else {
-        this.isAuthorized = AuthorizationStatus.Unauthorized;
-      }
-      this.user = { name: data.name, email: data.email };
+      this.setUser(data);
       localStorage.setItem("google_user", JSON.stringify(this.user));
     },
     logout() {
       google.accounts.id.disableAutoSelect();
+      this.setUser(null);
       this.user = null;
       localStorage.removeItem("google_user");
       this.$nextTick(() => this.renderGoogleButton());

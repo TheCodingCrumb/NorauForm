@@ -10,6 +10,7 @@ window.Form = {
             parkReferent: "",
             BTNumber: "",
             note: "",
+            isSubmiting: false,
         };
     },
     methods: {
@@ -24,6 +25,8 @@ window.Form = {
                 alert("❌ GOOGLE_SCRIPT_ID manquant dans config.js !");
                 return;
             }
+
+            this.isSubmiting = true;
 
             const payload = {
                 route: "submit-form",
@@ -73,15 +76,14 @@ window.Form = {
                     detail: err.message,
                     life: 10000,
                 });
+            } finally {
+                this.isSubmiting = false;
             }
         },
     },
     template: `
-    <template v-if="$root.isAuthorized.name === 'unauthorized'">
-        <p-panel class="form-blur">
-            <p-message class="over-display" severity="contrast" size="large" variant="outlined">
-                Vous n'avez pas l'accès à cette fonctionnalité
-            </p-message>
+    <template v-if="$root.loading">
+        <p-panel>
             <p-skeleton width="10rem" class="mb-2"></p-skeleton>
             <p-skeleton width="5rem" class="mb-2"></p-skeleton>
             <p-skeleton height="2rem" class="mb-2"></p-skeleton>
@@ -97,10 +99,10 @@ window.Form = {
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 10px; row-gap: 15px;">
                             <p-inputgroup>
                                 <p-inputgroupaddon>
-                                    <i class="material-symbols-outlined">business_center</i>
+                                    <i class="pi pi-briefcase"></i>
                                 </p-inputgroupaddon>
                                 <p-floatlabel variant="on">
-                                    <p-inputtext id="raison_sociale" type="text" inputmode="text" v-model="text1"></p-inputtext>
+                                    <p-inputtext id="raison_sociale" type="text" inputmode="text" v-model="raison_sociale"></p-inputtext>
                                     <label for="raison_sociale">Raison Sociale</label>
                                 </p-floatlabel>
                             </p-inputgroup>
@@ -109,7 +111,7 @@ window.Form = {
                                 <i class="material-symbols-outlined">badge</i>
                             </p-inputgroupaddon>
                             <p-floatlabel variant="on">
-                                <p-inputmask id="code_vendeur" mask="99" v-model="employeeCode"></p-inputmask>
+                                <p-inputmask id="code_vendeur" mask="9?9" v-model="employeeCode"></p-inputmask>
                                 <label for="code_vendeur">Code Vendeur</label>
                             </p-floatlabel>
                         </p-inputgroup>
@@ -118,7 +120,7 @@ window.Form = {
                                 <i class="material-symbols-outlined">assignment</i>
                             </p-inputgroupaddon>
                             <p-floatlabel variant="on">
-                                <p-inputmask id="BTNumber" type="text" mask="9999" v-model="BTNumber"></p-inputmask>
+                                <p-inputmask id="BTNumber" type="text" mask="9?999" v-model="BTNumber"></p-inputmask>
                                 <label for="BTNumber">BT</label>
                             </p-floatlabel>
                         </p-inputgroup>
@@ -187,7 +189,7 @@ window.Form = {
                     </div>
                     <div class="spacer"></div>
                     <div style="text-align: end">
-                        <p-button label="Envoyer" type="submit"></p-button>
+                        <p-button label="Envoyer" type="submit" icon="pi pi-search" :loading="isSubmiting"></p-button>
                     </div>
                 </fieldset>
             </form>
@@ -196,14 +198,14 @@ window.Form = {
     <template v-else>
         <p-panel class="form-blur">
             <p-message class="over-display" severity="contrast" size="large" variant="outlined">
-                Veuillez vous identifier avant de continuer
+                {{ $root.isAuthorized.name === 'unauthorized' ? "Vous n'avez pas l'accès à cette fonctionnalité" : "Veuillez vous identifier avant de continuer" }}
             </p-message>
-            <p-skeleton width="10rem" class="mb-2"></p-skeleton>
-            <p-skeleton width="5rem" class="mb-2"></p-skeleton>
-            <p-skeleton height="2rem" class="mb-2"></p-skeleton>
-            <p-skeleton width="10rem" class="mb-2"></p-skeleton>
-            <p-skeleton width="5rem" class="mb-2"></p-skeleton>
-            <p-skeleton height="2rem" class="mb-2"></p-skeleton>
+            <p-skeleton animation="none" width="10rem" class="mb-2"></p-skeleton>
+            <p-skeleton animation="none" width="5rem" class="mb-2"></p-skeleton>
+            <p-skeleton animation="none" height="2rem" class="mb-2"></p-skeleton>
+            <p-skeleton animation="none" width="10rem" class="mb-2"></p-skeleton>
+            <p-skeleton animation="none" width="5rem" class="mb-2"></p-skeleton>
+            <p-skeleton animation="none" height="2rem" class="mb-2"></p-skeleton>
         </p-panel>
     </template>
   `,
