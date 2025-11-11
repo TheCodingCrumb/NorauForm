@@ -34,10 +34,11 @@
 
 <body>
   <div id="app">
-    <noro-toolbar></noro-toolbar>
+    <c-toolbar></c-toolbar>
     <div class="spacer"></div>
-    <!-- <noro-body-test></noro-body-test> -->
-    <noro-form></noro-form>
+    <c-form></c-form>
+    <div v-if="$root.isAuthorized.name === 'authorized'" class="spacer"></div>
+    <c-notice v-if="$root.isAuthorized.name === 'authorized'"></c-notice>
     <p-toast position="bottom-right"></p-toast>
   </div>
 </body>

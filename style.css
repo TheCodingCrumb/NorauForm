@@ -1,3 +1,4 @@
+/* Elements */
 :root {
   --p-tooltip-max-width: 500px;
 }
@@ -9,8 +10,18 @@ html {
     'Segoe UI Emoji', 'Segoe UI Symbol';
 }
 
-.u-nomargin {
-  margin: 0 !important;
+ul {
+  padding-left: 15;
+}
+
+fieldset {
+  border: none;
+}
+
+/* Classes */
+
+.p-toolbar {
+  container-type: inline-size;
 }
 
 .connected-identity {
@@ -21,10 +32,6 @@ html {
 
 .connected-identity__user {
   text-align: right;
-}
-
-fieldset {
-  border: none;
 }
 
 .spacer {
@@ -51,4 +58,31 @@ fieldset {
   transform: translate(-50%, -50%);
   /* width: 80%; */
   z-index: 11;
+}
+
+.brand-logo {
+  width: 180px;
+  margin: auto;
+}
+
+/* MediaQueries */
+
+@media (min-width: 1250) {
+  .content-md-min {
+    width: 50%;
+    margin: auto;
+  }
+}
+
+
+@container (width: 900px) {
+  .brand-logo {
+    width: 10%;
+    margin: auto;
+  }
+}
+
+/* Utils */
+.u-nomargin {
+  margin: 0 !important;
 }

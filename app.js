@@ -1,5 +1,6 @@
 import { Toolbar } from './components/Toolbar.js';
 import { Form } from './components/Form.js';
+import { Notice } from './components/Notice.js';
 
 class AuthorizationStatus {
   static Visitor = new AuthorizationStatus("visitor");
@@ -76,19 +77,13 @@ const app = createApp({
 
         const result = await response.json();
         if (result.code === 200) {
-          this.$toast.add({
-            severity: "success",
-            summary: "Succès",
-            detail: result.message,
-            life: 10000,
-          });
           return true;
         } else if (result.code === 401) {
           this.$toast.add({
             severity: "error",
             summary: "Erreur",
             detail: result.message,
-            life: 10000,
+            life: 5000,
           });
         }
         else {
@@ -96,7 +91,7 @@ const app = createApp({
             severity: "error",
             summary: "Erreur",
             detail: result.message,
-            life: 10000,
+            life: 5000,
           });
         }
       } catch (err) {
@@ -104,7 +99,7 @@ const app = createApp({
           severity: "error",
           summary: "Erreur",
           detail: err.message,
-          life: 10000,
+          life: 5000,
         });
       } finally {
         this.loading = false;
@@ -147,13 +142,15 @@ app.use(PrimeVue.Config, {
 app.use(PrimeVue.ToastService);
 
 // Composants
-app.component("noro-form", Form);
-app.component("noro-toolbar", Toolbar);
+app.component("c-form", Form);
+app.component("c-toolbar", Toolbar);
+app.component("c-notice", Notice);
 
 // PrimeVue Import
 app.component("p-avatar", PrimeVue.Avatar);
 app.component("p-card", PrimeVue.Card);
 app.component("p-button", PrimeVue.Button);
+app.component("p-divider", PrimeVue.Divider);
 app.component("p-floatlabel", PrimeVue.FloatLabel);
 app.component("p-icon", PrimeVue.Icon);
 app.component("p-inputgroup", PrimeVue.InputGroup);
