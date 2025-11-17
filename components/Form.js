@@ -35,7 +35,7 @@ export const Form = defineComponent({
                 valid = false;
             }
 
-            if (!form.number.trim() && !form.email.trim()) {
+            if (!form.number && !form.email.trim()) {
                 errors.number = "Téléphone ou Email requis";
                 errors.email = "Téléphone ou Email requis";
                 valid = false;
@@ -122,87 +122,163 @@ export const Form = defineComponent({
             <fieldset :disabled="$root.user === null">
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 10px; row-gap: 15px; align-items: baseline;">
                     <!-- Raison Sociale -->
-                    <FormElement 
-                        v-model="form.raison_sociale"
-                        id="raison_sociale"
-                        label="Raison Sociale *"
-                        icon="business_center"
-                        type="text"
-                        :error="errors.raison_sociale"
-                    />
+                    <div>
+                        <p-inputgroup>
+                            <p-inputgroupaddon>
+                                <span class="material-symbols-outlined">business_center</span>
+                            </p-inputgroupaddon>
+
+                            <p-floatlabel variant="on">
+                                <p-inputtext
+                                    id="raison_sociale"
+                                    type="text"
+                                    v-model="form.raison_sociale"
+                                    :invalid="!!errors.raison_sociale"
+                                ></p-inputtext>
+                                <label for="raison_sociale">Raison Sociale *</label>
+                            </p-floatlabel>
+                        </p-inputgroup>
+
+                        <p-message v-if="errors.raison_sociale" severity="error" size="small" variant="simple">
+                            {{ errors.raison_sociale }}
+                        </p-message>
+                    </div>
                     <!-- Code vendeur -->
-                    <FormElement 
-                        v-model="form.code_vendeur"
-                        id="code_vendeur"
-                        label="Code Vendeur"
-                        icon="badge"
-                        type="mask"
-                        mask="9?9"
-                    />
+                    <p-inputgroup>
+                        <p-inputgroupaddon>
+                            <span class="material-symbols-outlined">badge</span>
+                        </p-inputgroupaddon>
+
+                        <p-floatlabel variant="on">
+                            <p-inputnumber
+                                id="code_vendeur"
+                                v-model="form.code_vendeur"
+                            ></p-inputnumber>
+                            <label for="code_vendeur">Code Vendeur</label>
+                        </p-floatlabel>
+                    </p-inputgroup>
                     <!-- BTNumber -->
-                    <FormElement 
-                        v-model="form.BTNumber"
-                        id="BTNumber"
-                        label="BT"
-                        icon="assignment"
-                        type="mask"
-                        mask="9?999"
-                    />
+                    <p-inputgroup>
+                        <p-inputgroupaddon>
+                            <span class="material-symbols-outlined">assignment</span>
+                        </p-inputgroupaddon>
+
+                        <p-floatlabel variant="on">
+                            <p-inputnumber
+                                id="BTNumber"
+                                v-model="form.BTNumber"
+                            ></p-inputnumber>
+                            <label for="BTNumber">BT</label>
+                        </p-floatlabel>
+                    </p-inputgroup>
                     <!-- Interlocuteur -->
-                    <FormElement 
-                        v-model="form.contact"
-                        id="contact"
-                        label="Interlocuteur"
-                        icon="face"
-                        type="text"
-                    />
+                    <p-inputgroup>
+                        <p-inputgroupaddon>
+                            <span class="material-symbols-outlined">face</span>
+                        </p-inputgroupaddon>
+
+                        <p-floatlabel variant="on">
+                            <p-inputtext
+                                id="contact"
+                                type="text"
+                                v-model="form.contact"
+                            ></p-inputtext>
+                            <label for="contact">Interlocuteur</label>
+                        </p-floatlabel>
+                    </p-inputgroup>
                     <!-- Gestionnaire de Parc -->
-                    <FormElement 
-                        v-model="form.parkReferent"
-                        id="parkReferent"
-                        label="Gestionnaire de Parc"
-                        icon="passkey"
-                        type="text"
-                    />
+                    <p-inputgroup>
+                        <p-inputgroupaddon>
+                            <span class="material-symbols-outlined">passkey</span>
+                        </p-inputgroupaddon>
+
+                        <p-floatlabel variant="on">
+                            <p-inputtext
+                                id="parkReferent"
+                                type="text"
+                                v-model="form.parkReferent"
+                            ></p-inputtext>
+                            <label for="parkReferent">Gestionnaire de Parc</label>
+                        </p-floatlabel>
+                    </p-inputgroup>
                     <!-- Taille de la Flotte -->
-                    <FormElement 
-                        v-model="form.parkSize"
-                        id="parkSize"
-                        label="Taille de la Flotte"
-                        icon="traffic_jam"
-                        type="number"
-                    />
+                    <p-inputgroup>
+                        <p-inputgroupaddon>
+                            <span class="material-symbols-outlined">traffic_jam</span>
+                        </p-inputgroupaddon>
+
+                        <p-floatlabel variant="on">
+                            <p-inputnumber
+                                id="parkSize"
+                                v-model="form.parkSize"
+                            ></p-inputnumber>
+                            <label for="parkSize">Taille de la Flotte</label>
+                        </p-floatlabel>
+                    </p-inputgroup>
                     <!-- Téléphone -->
-                    <FormElement 
-                        v-model="form.number"
-                        id="telephone"
-                        label="Téléphone"
-                        icon="call"
-                        type="mask"
-                        mask="99 99 99 99 99 ?9999"
-                        :error="errors.number"
-                    />
+                    <div>
+                        <p-inputgroup>
+                            <p-inputgroupaddon>
+                                <span class="material-symbols-outlined">call</span>
+                            </p-inputgroupaddon>
+
+                            <p-floatlabel variant="on">
+                                <p-inputnumber
+                                    id="telephone"
+                                    v-model="form.number"
+                                    :invalid="!!errors.number"
+                                ></p-inputnumber>
+                                <label for="telephone">Téléphone</label>
+                            </p-floatlabel>
+                        </p-inputgroup>
+
+                        <p-message v-if="errors.number" severity="error" size="small" variant="simple">
+                            {{ errors.number }}
+                        </p-message>
+                    </div>
                     <!-- Email -->
                     <div style="grid-column-start: 2; grid-column-end: 4;">
-                        <FormElement 
-                            v-model="form.email"
-                            id="email"
-                            label="Email"
-                            icon="email"
-                            type="text"
-                            :error="errors.email"
-                        />
+                        <div>
+                            <p-inputgroup>
+                                <p-inputgroupaddon>
+                                    <span class="material-symbols-outlined">email</span>
+                                </p-inputgroupaddon>
+
+                                <p-floatlabel variant="on">
+                                    <p-inputtext
+                                        id="email"
+                                        type="text"
+                                        v-model="form.email"
+                                        :invalid="!!errors.email"
+                                    ></p-inputtext>
+                                    <label for="email">Email</label>
+                                </p-floatlabel>
+                            </p-inputgroup>
+
+                            <p-message v-if="errors.email" severity="error" size="small" variant="simple">
+                                {{ errors.email }}
+                            </p-message>
+                        </div>
                     </div>
                     <!-- Note -->
                     <div style="grid-column-start: 1; grid-column-end: 4;">
-                        <FormElement 
-                            v-model="form.note"
-                            id="note"
-                            label="Informations complémentaires"
-                            icon="info"
-                            type="textarea"
-                        />
+                        <p-inputgroup>
+                            <p-inputgroupaddon>
+                                <span class="material-symbols-outlined">info</span>
+                            </p-inputgroupaddon>
+
+                            <p-floatlabel variant="on">
+                                <p-textarea
+                                    id="note"
+                                    v-model="form.note"
+                                    fluid
+                                    autoResize
+                                ></p-textarea>
+                                <label for="note">Informations complémentaires</label>
+                            </p-floatlabel>
+                        </p-inputgroup>
                     </div>
+
                 </div>
 
                 <div style="text-align: end; margin-top: 1rem;">
