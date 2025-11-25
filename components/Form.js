@@ -23,6 +23,8 @@ export const Form = defineComponent({
 
         const errors = reactive({});
 
+        const resetKey = ref(0);
+
         const validateForm = () => {
             errors.raison_sociale = "";
             errors.number = "";
@@ -93,6 +95,7 @@ export const Form = defineComponent({
                         life: 10000,
                     });
                     Object.keys(form).forEach(k => form[k] = "");
+                    resetKey.value++;
                 } else {
                     root.$toast.add({
                         severity: "error",
@@ -113,7 +116,7 @@ export const Form = defineComponent({
             }
         };
 
-        return { form, errors, isSubmiting, submitForm };
+        return { form, errors, isSubmiting, submitForm, resetKey };
     },
 
     template: `
@@ -150,10 +153,13 @@ export const Form = defineComponent({
                         </p-inputgroupaddon>
 
                         <p-floatlabel variant="on">
-                            <p-inputnumber
+                            <p-inputmask
                                 id="code_vendeur"
-                                v-model="form.code_vendeur"
-                            ></p-inputnumber>
+                                mask="9?9"
+                                v-model="form.employeeCode"
+                                :autoClear="false"
+                                :key="resetKey"
+                            ></p-inputmask>
                             <label for="code_vendeur">Code Vendeur</label>
                         </p-floatlabel>
                     </p-inputgroup>
@@ -164,10 +170,13 @@ export const Form = defineComponent({
                         </p-inputgroupaddon>
 
                         <p-floatlabel variant="on">
-                            <p-inputnumber
+                            <p-inputmask
                                 id="BTNumber"
+                                mask="9?999"
                                 v-model="form.BTNumber"
-                            ></p-inputnumber>
+                                :autoClear="false"
+                                :key="resetKey"
+                            ></p-inputmask>
                             <label for="BTNumber">BT</label>
                         </p-floatlabel>
                     </p-inputgroup>
@@ -225,9 +234,11 @@ export const Form = defineComponent({
                             <p-floatlabel variant="on">
                                 <p-inputmask
                                     id="telephone"
-                                    mask="?9999999999999999"
+                                    mask="99 99 99 99 99 ?9999"
                                     v-model="form.number"
                                     :invalid="!!errors.number"
+                                    :autoClear="false"
+                                    :key="resetKey"
                                 ></p-inputmask>
                                 <label for="telephone">Téléphone</label>
                             </p-floatlabel>
