@@ -23,6 +23,8 @@ export const Form = defineComponent({
 
         const errors = reactive({});
 
+        const resetKey = ref(0);
+
         const validateForm = () => {
             errors.raison_sociale = "";
             errors.number = "";
@@ -35,7 +37,7 @@ export const Form = defineComponent({
                 valid = false;
             }
 
-            if (!form.number && !form.email.trim()) {
+            if (!form.number.trim() && !form.email.trim()) {
                 errors.number = "Téléphone ou Email requis";
                 errors.email = "Téléphone ou Email requis";
                 valid = false;
@@ -93,6 +95,7 @@ export const Form = defineComponent({
                         life: 10000,
                     });
                     Object.keys(form).forEach(k => form[k] = "");
+                    resetKey.value++;
                 } else {
                     root.$toast.add({
                         severity: "error",
@@ -113,7 +116,7 @@ export const Form = defineComponent({
             }
         };
 
-        return { form, errors, isSubmiting, submitForm };
+        return { form, errors, isSubmiting, submitForm, resetKey };
     },
 
     template: `
@@ -150,10 +153,13 @@ export const Form = defineComponent({
                         </p-inputgroupaddon>
 
                         <p-floatlabel variant="on">
-                            <p-inputnumber
+                            <p-inputmask
                                 id="code_vendeur"
-                                v-model="form.code_vendeur"
-                            ></p-inputnumber>
+                                mask="9?9"
+                                v-model="form.employeeCode"
+                                :autoClear="false"
+                                :key="resetKey"
+                            ></p-inputmask>
                             <label for="code_vendeur">Code Vendeur</label>
                         </p-floatlabel>
                     </p-inputgroup>
@@ -164,10 +170,13 @@ export const Form = defineComponent({
                         </p-inputgroupaddon>
 
                         <p-floatlabel variant="on">
-                            <p-inputnumber
+                            <p-inputmask
                                 id="BTNumber"
+                                mask="9?999"
                                 v-model="form.BTNumber"
-                            ></p-inputnumber>
+                                :autoClear="false"
+                                :key="resetKey"
+                            ></p-inputmask>
                             <label for="BTNumber">BT</label>
                         </p-floatlabel>
                     </p-inputgroup>
@@ -223,11 +232,14 @@ export const Form = defineComponent({
                             </p-inputgroupaddon>
 
                             <p-floatlabel variant="on">
-                                <p-inputnumber
+                                <p-inputmask
                                     id="telephone"
+                                    mask="99 99 99 99 99 ?9999"
                                     v-model="form.number"
                                     :invalid="!!errors.number"
-                                ></p-inputnumber>
+                                    :autoClear="false"
+                                    :key="resetKey"
+                                ></p-inputmask>
                                 <label for="telephone">Téléphone</label>
                             </p-floatlabel>
                         </p-inputgroup>
@@ -291,6 +303,14 @@ export const Form = defineComponent({
         <p-message v-if="!$root.loading" class="over-display" severity="contrast" size="large" variant="outlined">
             {{ $root.isAuthorized.name === 'unauthorized' ? "Vous n'avez pas l'accès à cette fonctionnalité" : "Veuillez vous identifier avant de continuer" }}
         </p-message>
+        <div v-else class="over-display" >
+            <p-message severity="contrast" size="large" variant="outlined">
+                Vérification des authorisations en cours...
+            </p-message>
+            <div class="spacer"></div>
+            <p-progressbar mode="indeterminate" style="height: 6px"></p-progressbar>
+        </div>
+        
         <p-skeleton :animation="$root.loading ? '' : 'none'" width="10rem" class="mb-2"></p-skeleton>
         <p-skeleton :animation="$root.loading ? '' : 'none'" width="5rem" class="mb-2"></p-skeleton>
         <p-skeleton :animation="$root.loading ? '' : 'none'" height="2rem" class="mb-2"></p-skeleton>

@@ -160,6 +160,7 @@ app.component("p-inputnumber", PrimeVue.InputNumber);
 app.component("p-inputtext", PrimeVue.InputText);
 app.component("p-message", PrimeVue.Message);
 app.component("p-panel", PrimeVue.Panel);
+app.component("p-progressbar", PrimeVue.ProgressBar);
 app.component("p-select", PrimeVue.Select);
 app.component("p-skeleton", PrimeVue.Skeleton);
 app.component("p-textarea", PrimeVue.Textarea);
