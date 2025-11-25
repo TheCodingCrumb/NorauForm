@@ -314,7 +314,7 @@ export const Form = defineComponent({
         </p-message>
         <div v-else class="over-display" >
             <p-message severity="contrast" size="large" variant="outlined">
-                Vérification des authorisations en cours...
+                Vérification des autorisations en cours...
             </p-message>
             <div class="spacer"></div>
             <p-progressbar mode="indeterminate" style="height: 6px"></p-progressbar>
