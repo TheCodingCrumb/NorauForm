@@ -1,24 +1,17 @@
 import { Toolbar } from './components/Toolbar.js';
 import { Form } from './components/Form.js';
 import { Notice } from './components/Notice.js';
-
-class AuthorizationStatus {
-  static Visitor = new AuthorizationStatus("visitor");
-  static Authorized = new AuthorizationStatus("authorized");
-  static Unauthorized = new AuthorizationStatus("unauthorized");
-
-  constructor(name) {
-    this.name = name;
-  }
-}
+import { callGoogleScript } from './utils/api.js';
+import { store, AuthorizationStatus } from './utils/store.js';
 
 const { createApp } = Vue;
 const app = createApp({
   data() {
+    return store;
+  },
+  provide() {
     return {
-      user: null,
-      loading: false,
-      isAuthorized: AuthorizationStatus.Visitor,
+      store: store
     };
   },
   async mounted() {
@@ -57,37 +50,9 @@ const app = createApp({
       this.isAuthorized = await this.canConnect(user.email) ? AuthorizationStatus.Authorized : AuthorizationStatus.Unauthorized;
     },
     async canConnect(email) {
-      const payload = {
-        route: "form-authorization",
-        authorEmail: email,
-      };
-
       try {
-        const scriptId = window.APP_CONFIG?.GOOGLE_SCRIPT_ID;
-
-        if (!scriptId) {
-          this.$toast.add({
-            severity: "error",
-            summary: "Erreur",
-            detail: "Un problème est survenu durant la connexion. Contactez votre CCP.",
-            life: 10000,
-          });
-          console.error("GOOGLE_SCRIPT_ID manquant dans config.js !");
-          return;
-        }
-
         this.loading = true;
-
-        const response = await fetch(
-          `https://script.google.com/macros/s/${scriptId}/exec`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload),
-          }
-        );
-
-        const result = await response.json();
+        const result = await callGoogleScript("form-authorization", { authorEmail: email });
         if (result.code === 200) {
           return true;
         } else if (result.code === 401) {
@@ -97,8 +62,7 @@ const app = createApp({
             detail: result.message,
             life: 5000,
           });
-        }
-        else {
+        } else {
           this.$toast.add({
             severity: "error",
             summary: "Erreur",
