@@ -24,7 +24,13 @@ const app = createApp({
   async mounted() {
     const clientId = window.APP_CONFIG?.GOOGLE_CLIENT_ID;
     if (!clientId) {
-      alert("❌ GOOGLE_CLIENT_ID manquant dans config.js !");
+      this.$toast.add({
+        severity: "error",
+        summary: "Erreur",
+        detail: "Un problème est survenu durant le démarrage de l'app. Contactez votre CCP.",
+        life: 10000,
+      });
+      console.error("GOOGLE_CLIENT_ID manquant dans config.js !");
       return;
     }
 
@@ -60,7 +66,13 @@ const app = createApp({
         const scriptId = window.APP_CONFIG?.GOOGLE_SCRIPT_ID;
 
         if (!scriptId) {
-          alert("❌ GOOGLE_SCRIPT_ID manquant dans config.js !");
+          this.$toast.add({
+            severity: "error",
+            summary: "Erreur",
+            detail: "Un problème est survenu durant la connexion. Contactez votre CCP.",
+            life: 10000,
+          });
+          console.error("GOOGLE_SCRIPT_ID manquant dans config.js !");
           return;
         }
 
@@ -147,8 +159,6 @@ app.component("c-toolbar", Toolbar);
 app.component("c-notice", Notice);
 
 // PrimeVue Import
-app.component("p-avatar", PrimeVue.Avatar);
-app.component("p-card", PrimeVue.Card);
 app.component("p-button", PrimeVue.Button);
 app.component("p-divider", PrimeVue.Divider);
 app.component("p-floatlabel", PrimeVue.FloatLabel);
@@ -161,7 +171,6 @@ app.component("p-inputtext", PrimeVue.InputText);
 app.component("p-message", PrimeVue.Message);
 app.component("p-panel", PrimeVue.Panel);
 app.component("p-progressbar", PrimeVue.ProgressBar);
-app.component("p-select", PrimeVue.Select);
 app.component("p-skeleton", PrimeVue.Skeleton);
 app.component("p-textarea", PrimeVue.Textarea);
 app.component("p-toast", PrimeVue.Toast);

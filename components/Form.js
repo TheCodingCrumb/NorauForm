@@ -1,9 +1,7 @@
 const { defineComponent, ref, reactive } = Vue;
-import { FormElement } from './FormElement.js';
 
 export const Form = defineComponent({
     name: "Form",
-    components: { FormElement },
     setup() {
         const root = Vue.getCurrentInstance().proxy.$root;
 
@@ -50,13 +48,24 @@ export const Form = defineComponent({
             if (!validateForm()) return;
 
             if (!root.user) {
-                alert("⚠️ Connecte-toi avec Google avant de soumettre le formulaire !");
+                root.$toast.add({
+                    severity: "error",
+                    summary: "Erreur",
+                    detail: "Connectez-vous avec Google avant de soumettre le formulaire !",
+                    life: 10000,
+                });
                 return;
             }
 
             const scriptId = window.APP_CONFIG?.GOOGLE_SCRIPT_ID;
             if (!scriptId) {
-                alert("❌ GOOGLE_SCRIPT_ID manquant dans config.js !");
+                root.$toast.add({
+                    severity: "error",
+                    summary: "Erreur",
+                    detail: "Un problème est survenu durant l'envoi. Contactez votre CCP.",
+                    life: 10000,
+                });
+                console.error("GOOGLE_SCRIPT_ID manquant dans config.js !");
                 return;
             }
 
@@ -235,6 +244,7 @@ export const Form = defineComponent({
                                 <p-inputmask
                                     id="telephone"
                                     mask="99 99 99 99 99 ?9999"
+                                    :unmask="true"
                                     v-model="form.number"
                                     :invalid="!!errors.number"
                                     :autoClear="false"
