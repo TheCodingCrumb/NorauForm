@@ -1,30 +1,29 @@
 import { Toolbar } from './components/Toolbar.js';
 import { Form } from './components/Form.js';
 import { Notice } from './components/Notice.js';
-
-class AuthorizationStatus {
-  static Visitor = new AuthorizationStatus("visitor");
-  static Authorized = new AuthorizationStatus("authorized");
-  static Unauthorized = new AuthorizationStatus("unauthorized");
-
-  constructor(name) {
-    this.name = name;
-  }
-}
+import { callGoogleScript } from './utils/api.js';
+import { store, AuthorizationStatus } from './utils/store.js';
 
 const { createApp } = Vue;
 const app = createApp({
   data() {
+    return store;
+  },
+  provide() {
     return {
-      user: null,
-      loading: false,
-      isAuthorized: AuthorizationStatus.Visitor,
+      store: store
     };
   },
   async mounted() {
     const clientId = window.APP_CONFIG?.GOOGLE_CLIENT_ID;
     if (!clientId) {
-      alert("❌ GOOGLE_CLIENT_ID manquant dans config.js !");
+      this.$toast.add({
+        severity: "error",
+        summary: "Erreur",
+        detail: "Un problème est survenu durant le démarrage de l'app. Contactez votre CCP.",
+        life: 10000,
+      });
+      console.error("GOOGLE_CLIENT_ID manquant dans config.js !");
       return;
     }
 
@@ -51,31 +50,9 @@ const app = createApp({
       this.isAuthorized = await this.canConnect(user.email) ? AuthorizationStatus.Authorized : AuthorizationStatus.Unauthorized;
     },
     async canConnect(email) {
-      const payload = {
-        route: "form-authorization",
-        authorEmail: email,
-      };
-
       try {
-        const scriptId = window.APP_CONFIG?.GOOGLE_SCRIPT_ID;
-
-        if (!scriptId) {
-          alert("❌ GOOGLE_SCRIPT_ID manquant dans config.js !");
-          return;
-        }
-
         this.loading = true;
-
-        const response = await fetch(
-          `https://script.google.com/macros/s/${scriptId}/exec`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload),
-          }
-        );
-
-        const result = await response.json();
+        const result = await callGoogleScript("form-authorization", { authorEmail: email });
         if (result.code === 200) {
           return true;
         } else if (result.code === 401) {
@@ -85,8 +62,7 @@ const app = createApp({
             detail: result.message,
             life: 5000,
           });
-        }
-        else {
+        } else {
           this.$toast.add({
             severity: "error",
             summary: "Erreur",
@@ -147,8 +123,6 @@ app.component("c-toolbar", Toolbar);
 app.component("c-notice", Notice);
 
 // PrimeVue Import
-app.component("p-avatar", PrimeVue.Avatar);
-app.component("p-card", PrimeVue.Card);
 app.component("p-button", PrimeVue.Button);
 app.component("p-divider", PrimeVue.Divider);
 app.component("p-floatlabel", PrimeVue.FloatLabel);
@@ -161,7 +135,6 @@ app.component("p-inputtext", PrimeVue.InputText);
 app.component("p-message", PrimeVue.Message);
 app.component("p-panel", PrimeVue.Panel);
 app.component("p-progressbar", PrimeVue.ProgressBar);
-app.component("p-select", PrimeVue.Select);
 app.component("p-skeleton", PrimeVue.Skeleton);
 app.component("p-textarea", PrimeVue.Textarea);
 app.component("p-toast", PrimeVue.Toast);
