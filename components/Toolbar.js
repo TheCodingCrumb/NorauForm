@@ -1,4 +1,7 @@
-window.Toolbar = {
+const { defineComponent } = Vue;
+
+export const Toolbar = defineComponent({
+  name: "Toolbar",
   template: `
     <p-toolbar class="flex">
       <template #start>
@@ -15,7 +18,7 @@ window.Toolbar = {
         <div v-else class="connected-identity">
           <div class="connected-identity__user">
             Saisie en tant que
-            <br><b v-tooltip.top="$root.user.email"> {{ $root.user.name }}</b>
+            <br><b v-tooltip.bottom="$root.user.email"> {{ $root.user.name }}</b>
             <!-- <p-avatar :label="$root.user.name.charAt(0)" class="mr-2" size="xlarge" shape="circle"></p-avatar> -->
           </div>
           <p-button @click="$root.logout" severity="secondary" rounded>
@@ -27,4 +30,4 @@ window.Toolbar = {
       </template>
     </p-toolbar>
   `,
-};
+});
